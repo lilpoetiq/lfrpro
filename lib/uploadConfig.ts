@@ -38,31 +38,40 @@ export function getProjectRoot(): string {
   return _projectRoot
 }
 
+/** Vercel serverless FS is read-only except /tmp — default data/upload dirs must live there unless env overrides. */
+const isVercelRuntime = process.env.VERCEL === '1'
+
 const rawUpload = stripQuotes(process.env.UPLOAD_DIR)
 
 /**
  * Central upload directory - all files (album covers, beats, track audio, etc.) use this base.
  * Relative UPLOAD_DIR is resolved from the project root, not whatever cwd Next picked.
  * Default: project root (album-covers, beats, track-audio, etc. live here).
+ * On Vercel (no UPLOAD_DIR): /tmp/lfr-uploads
  */
 export const UPLOAD_BASE = rawUpload
   ? path.isAbsolute(rawUpload)
     ? rawUpload
     : path.resolve(getProjectRoot(), rawUpload)
-  : getProjectRoot()
+  : isVercelRuntime
+    ? path.join('/tmp', 'lfr-uploads')
+    : getProjectRoot()
 
 const rawData = stripQuotes(process.env.DATA_DIR)
 
 /**
  * Data directory - catalog.db, backups, JSON files.
  * Relative DATA_DIR is resolved from project root.
- * Default: ./data (inside project folder)
+ * Default: ./data (inside project folder).
+ * On Vercel (no DATA_DIR): /tmp/lfr-data
  */
 export const DATA_BASE = rawData
   ? path.isAbsolute(rawData)
     ? rawData
     : path.resolve(getProjectRoot(), rawData)
-  : path.join(getProjectRoot(), 'data')
+  : isVercelRuntime
+    ? path.join('/tmp', 'lfr-data')
+    : path.join(getProjectRoot(), 'data')
 
 /** Resolve path for a category (e.g. album-covers, beats, track-audio) */
 export function getUploadPath(...segments: string[]): string {

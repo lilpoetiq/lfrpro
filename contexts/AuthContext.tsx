@@ -66,7 +66,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ username, password }),
       })
 
-      const data = await res.json()
+      const text = await res.text()
+      let data: { success?: boolean; user?: User; error?: string }
+      try {
+        data = text ? JSON.parse(text) : {}
+      } catch {
+        console.error('Login error: non-JSON response', res.status, text.slice(0, 200))
+        return false
+      }
 
       if (data.success && data.user) {
         setUser(data.user)
