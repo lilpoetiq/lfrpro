@@ -13,7 +13,6 @@ import {
   MessageSquare,
   Upload,
   Brain,
-  LogOut,
   Menu,
   X,
   Activity,
@@ -54,7 +53,7 @@ export default function SidebarClient() {
   const [sidebarSize, setSidebarSize] = useState<SidebarSize>('medium')
   const [showSidebarButton, setShowSidebarButton] = useState(false)
   const [showProfileModal, setShowProfileModal] = useState(false)
-  const { user, logout, staffViewMode, setStaffViewMode } = useAuth()
+  const { user, staffViewMode, setStaffViewMode } = useAuth()
 
   const isStaff =
     user?.role === 'artist' &&
@@ -792,18 +791,6 @@ export default function SidebarClient() {
             </div>
           </div>
         )}
-
-        <button
-          onClick={logout}
-          className={clsx(
-            'w-full flex items-center rounded-lg text-slate-400 hover:bg-slate-900 hover:text-white transition',
-            sidebarSize === 'small' ? 'justify-center px-2 py-2.5' : 'space-x-2.5 px-3 py-2.5'
-          )}
-          title={sidebarSize === 'small' ? 'Logout' : undefined}
-        >
-          <LogOut className={clsx('flex-shrink-0', sidebarSize === 'small' ? 'w-5 h-5' : 'w-4 h-4')} />
-          {sidebarSize !== 'small' && <span className="font-medium text-sm">Logout</span>}
-        </button>
             </div>
           </>
         )}

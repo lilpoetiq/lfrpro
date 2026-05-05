@@ -246,10 +246,7 @@ export default function ReleaseReadinessPage() {
 
   useEffect(() => {
     if (!authLoading) {
-      if (!user) {
-        router.push('/login')
-        return
-      }
+      if (!user) return
       if (user.role !== 'artist' && user.role !== 'admin') {
         router.push('/dashboard')
         return

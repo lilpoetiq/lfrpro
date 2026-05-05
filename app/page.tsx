@@ -7,18 +7,11 @@ export default function Home() {
   const router = useRouter()
 
   useEffect(() => {
-    // Check if user is logged in immediately
-    const user = localStorage.getItem('user')
-    if (user) {
-      router.replace('/dashboard')
-    } else {
-      router.replace('/login')
-    }
+    router.replace('/dashboard')
   }, [router])
 
-  // Show dark-themed loading state while redirecting
   return (
-    <div 
+    <div
       className="min-h-screen flex items-center justify-center bg-black"
       style={{ backgroundColor: '#000000', minHeight: '100vh' }}
     >
@@ -26,4 +19,3 @@ export default function Home() {
     </div>
   )
 }
-

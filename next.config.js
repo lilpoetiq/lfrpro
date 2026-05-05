@@ -12,6 +12,9 @@ const nextConfig = {
   compress: true,
   // Disable the dev indicator badge completely
   devIndicators: false,
+  async redirects() {
+    return [{ source: '/login', destination: '/dashboard', permanent: false }]
+  },
   experimental: {
     // Increase body size limit for App Router API routes (FormData uploads)
     // This is required for large CSV file uploads and beat pack uploads

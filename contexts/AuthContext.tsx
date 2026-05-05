@@ -1,12 +1,19 @@
 'use client'
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { User, UserRole } from '@/types'
+import { User } from '@/types'
+
+/** Single local identity while real auth is redesigned. */
+const GUEST_USER: User = {
+  id: 'guest-local',
+  username: 'guest',
+  email: 'guest@local',
+  name: 'Guest',
+  role: 'admin',
+}
 
 interface AuthContextType {
   user: User | null
-  login: (username: string, password: string) => Promise<boolean>
   logout: () => void
   updateUserProfile: (updatedUser: Partial<User> & { id: string }) => void
   isLoading: boolean
@@ -16,119 +23,61 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-// Mock users database
-const MOCK_USERS: User[] = [
-  {
-    id: '1',
-    email: 'artist@lfr.com',
-    name: 'Alex Johnson',
-    role: 'artist',
-  },
-  {
-    id: '2',
-    email: 'manager@lfr.com',
-    name: 'Sarah Williams',
-    role: 'manager',
-  },
-  {
-    id: '3',
-    email: 'admin@lfr.com',
-    name: 'Michael Chen',
-    role: 'admin',
-  },
-]
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<User | null>(GUEST_USER)
   const [isLoading, setIsLoading] = useState(true)
   const [staffViewMode, setStaffViewMode] = useState<'artist' | 'staff'>('artist')
-  const router = useRouter()
 
   useEffect(() => {
-    // Check for stored user session
-    const storedUser = localStorage.getItem('user')
-    if (storedUser) {
-      setUser(JSON.parse(storedUser))
+    try {
+      const storedViewMode = localStorage.getItem('staffViewMode')
+      if (storedViewMode === 'artist' || storedViewMode === 'staff') {
+        setStaffViewMode(storedViewMode)
+      }
+    } catch {
+      localStorage.removeItem('staffViewMode')
     }
-    // Check for stored staff view mode
-    const storedViewMode = localStorage.getItem('staffViewMode')
-    if (storedViewMode === 'artist' || storedViewMode === 'staff') {
-      setStaffViewMode(storedViewMode)
+    try {
+      localStorage.removeItem('user')
+    } catch {
+      /* ignore */
     }
     setIsLoading(false)
   }, [])
 
-  const login = async (username: string, password: string): Promise<boolean> => {
-    try {
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      })
-
-      const text = await res.text()
-      let data: { success?: boolean; user?: User; error?: string }
-      try {
-        data = text ? JSON.parse(text) : {}
-      } catch {
-        console.error('Login error: non-JSON response', res.status, text.slice(0, 200))
-        return false
-      }
-
-      if (data.success && data.user) {
-        setUser(data.user)
-        localStorage.setItem('user', JSON.stringify(data.user))
-        return true
-      }
-      return false
-    } catch (error) {
-      console.error('Login error:', error)
-      return false
-    }
-  }
-
-  const logout = async () => {
-    // Log logout activity
-    if (user) {
-      try {
-        await fetch('/api/activity-log', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'User logged out',
-            user: user.name,
-            userId: user.id,
-            details: {
-              username: user.username,
-              role: user.role,
-            },
-            category: 'auth',
-          }),
-        })
-      } catch (error) {
-        console.error('Failed to log logout activity:', error)
-      }
-    }
-    
-    setUser(null)
-    localStorage.removeItem('user')
-    router.push('/login')
-  }
+  const logout = () => {}
 
   const handleSetStaffViewMode = (mode: 'artist' | 'staff') => {
     setStaffViewMode(mode)
-    localStorage.setItem('staffViewMode', mode)
+    try {
+      localStorage.setItem('staffViewMode', mode)
+    } catch {
+      /* ignore */
+    }
   }
 
   const updateUserProfile = (updatedUser: Partial<User> & { id: string }) => {
     if (!user || user.id !== updatedUser.id) return
     const merged = { ...user, ...updatedUser }
     setUser(merged)
-    localStorage.setItem('user', JSON.stringify(merged))
+    try {
+      localStorage.setItem('user', JSON.stringify(merged))
+    } catch {
+      /* ignore */
+    }
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, updateUserProfile, isLoading, staffViewMode, setStaffViewMode: handleSetStaffViewMode }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        logout,
+        updateUserProfile,
+        isLoading,
+        staffViewMode,
+        setStaffViewMode: handleSetStaffViewMode,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   )
@@ -141,4 +90,3 @@ export function useAuth() {
   }
   return context
 }
-
