@@ -1,0 +1,62 @@
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+.vercel/
+
+# Build / cache
+.turbo
+*.tsbuildinfo
+
+# Env (never commit secrets)
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.production.local
+.env.test.local
+.env.local.backup.*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test / coverage
+coverage/
+.nyc_output
+
+# Local tooling (uncomment if you do not want these in the repo)
+# .vscode/
+
+# ---------------------------------------------------------------------------
+# Large / runtime data — keep out of git (use DATA_DIR + UPLOAD_DIR on a disk;
+# see EXTERNAL_DATA.md). Paths below are defaults when env is unset.
+# ---------------------------------------------------------------------------
+/data/
+
+# File uploads (UPLOAD_DIR defaults to project root)
+/album-covers/
+/audio/
+/beat-files/
+/beats/
+/catalog/
+/instagram-screenshots/
+/spotify-screenshots/
+/track-audio/
+/music-videos/
+
+# Local vault / submissions (large runtime data; never ship to git or Vercel)
+/vault/
+/submissions/
+lfr-dashboard.zip
+
+# If already tracked, run: git rm -r --cached <path> && git commit

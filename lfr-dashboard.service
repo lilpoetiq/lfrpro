@@ -1,0 +1,19 @@
+[Unit]
+Description=LFR Dashboard Next.js App
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/lfr-dashboard
+Environment=NODE_ENV=production
+Environment=PORT=3000
+ExecStart=/usr/bin/npm start
+Restart=always
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=lfr-dashboard
+
+[Install]
+WantedBy=multi-user.target

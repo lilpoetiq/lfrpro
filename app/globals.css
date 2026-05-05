@@ -1,0 +1,513 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #000000;
+  --foreground: #ffffff;
+  --sidebar-width: 200px; /* Default sidebar width */
+}
+
+.dark {
+  --background: #000000;
+  --foreground: #ffffff;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+html {
+  background: #000000;
+  overflow-x: hidden;
+  /* iOS safe area support */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /*
+    Release hero main title (Syne): arbitrary text-* sizes and global mobile rules can
+    force line-height:1 and clip descenders. This scoped utility wins over both.
+  */
+  .release-hero-title {
+    line-height: 1.25 !important;
+    padding-top: 0.08em !important;
+    padding-bottom: 0.24em !important;
+    overflow: visible !important;
+  }
+
+  /* Layered dashboard backdrop — avoids flat black panels */
+  .dashboard-canvas {
+    position: relative;
+    isolation: isolate;
+    background:
+      radial-gradient(ellipse 120% 80% at 15% -10%, rgba(127, 29, 29, 0.22), transparent 52%),
+      radial-gradient(ellipse 90% 60% at 95% 15%, rgba(30, 58, 138, 0.12), transparent 48%),
+      linear-gradient(180deg, #050508 0%, #020203 45%, #000000 100%);
+  }
+
+  .dashboard-canvas::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.9;
+  }
+
+  .dashboard-canvas > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .hover-lift {
+    transition:
+      transform 0.35s cubic-bezier(0.33, 1, 0.68, 1),
+      box-shadow 0.35s ease,
+      border-color 0.25s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: var(--tw-shadow-lift, 0 22px 44px -14px rgba(0, 0, 0, 0.65));
+  }
+
+  /* Subtle entrance only — keep visible if animation is skipped */
+  .stagger-children > * {
+    animation: dashReveal 0.5s ease-out both;
+  }
+
+  .stagger-children > *:nth-child(1) {
+    animation-delay: 0.03s;
+  }
+  .stagger-children > *:nth-child(2) {
+    animation-delay: 0.06s;
+  }
+  .stagger-children > *:nth-child(3) {
+    animation-delay: 0.09s;
+  }
+  .stagger-children > *:nth-child(4) {
+    animation-delay: 0.12s;
+  }
+  .stagger-children > *:nth-child(5) {
+    animation-delay: 0.15s;
+  }
+  .stagger-children > *:nth-child(6) {
+    animation-delay: 0.18s;
+  }
+}
+
+@keyframes dashReveal {
+  from {
+    opacity: 0.96;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #444;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+/* Mobile responsive utilities */
+@media (max-width: 640px) {
+  .mobile-hidden {
+    display: none !important;
+  }
+  
+  .mobile-full-width {
+    width: 100% !important;
+  }
+  
+  .mobile-text-sm {
+    font-size: 0.875rem !important;
+  }
+  
+  .mobile-p-2 {
+    padding: 0.5rem !important;
+  }
+
+  /*
+    Do not set global h1/h2/h3 with !important — it overrides Tailwind utilities and
+    clips decorative fonts (e.g. Syne) on release heroes. Use per-page utilities instead.
+
+    IMPORTANT: Avoid global element overrides (table/tr/td/button/.flex/attribute selectors) on mobile.
+    They made the whole dashboard layout unpredictable.
+    Use scoped utility classes instead (see .responsive-table below).
+  */
+
+  /* Prevent iOS zoom on form focus without blowing up spacing everywhere */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  textarea,
+  select {
+    font-size: 16px;
+  }
+
+  /* Better mobile spacing */
+  .space-y-8 > * + * {
+    margin-top: 1.5rem !important;
+  }
+
+  .space-y-6 > * + * {
+    margin-top: 1.25rem !important;
+  }
+
+  .space-y-4 > * + * {
+    margin-top: 1rem !important;
+  }
+
+  /* Touch-friendly buttons */
+  button,
+  a[role="button"],
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Better mobile padding */
+  .p-6 {
+    padding: 1rem !important;
+  }
+
+  .p-8 {
+    padding: 1.25rem !important;
+  }
+
+  .px-6 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .py-6 {
+    padding-top: 1rem !important;
+    padding-bottom: 1rem !important;
+  }
+}
+
+/* Touch-friendly buttons on mobile */
+@media (max-width: 1024px) {
+  /* On mobile/tablet, sidebar is hidden by default (hamburger menu) */
+  /* Sidebar width is handled by JavaScript, but ensure it's 0 on mobile */
+  main[style*="marginLeft"] {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Better mobile scrolling */
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Better modal sizing on mobile */
+  .fixed.inset-0 {
+    padding: 0.5rem !important;
+  }
+
+  /* Ensure modals don't overflow on mobile */
+  [class*="max-w"] {
+    max-width: calc(100vw - 1rem) !important;
+  }
+
+  /* Better text wrapping */
+  .truncate {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Prevent horizontal overflow */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Better text sizing on mobile */
+  .text-3xl {
+    font-size: 1.75rem !important;
+  }
+
+  .text-2xl {
+    font-size: 1.5rem !important;
+  }
+
+  .text-xl {
+    font-size: 1.25rem !important;
+  }
+}
+
+/* Responsive “table → cards” behavior (opt-in only) */
+@media (max-width: 640px) {
+  .responsive-table {
+    display: block;
+    width: 100%;
+  }
+
+  .responsive-table thead {
+    display: none;
+  }
+
+  .responsive-table tbody {
+    display: block;
+  }
+
+  .responsive-table tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(51, 65, 85, 0.5);
+    border-radius: 1rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+  }
+
+  .responsive-table tr:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  }
+
+  .responsive-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    text-align: left;
+    padding: 0.875rem 0;
+    border: none;
+    border-bottom: 1px solid rgba(51, 65, 85, 0.3);
+    gap: 1rem;
+  }
+
+  .responsive-table td:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .responsive-table td:first-child {
+    padding-top: 0;
+  }
+
+  .responsive-table td[data-label]::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+    min-width: 90px;
+    margin-right: 0.5rem;
+  }
+
+  .responsive-table td[data-label=""]::before {
+    display: none;
+  }
+
+  /* Better mobile layout for table cells */
+  .responsive-table td > * {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Special styling for Release cell */
+  .responsive-table td[data-label="Release"] {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+  }
+
+  .responsive-table td[data-label="Release"] > div {
+    width: 100%;
+  }
+
+  /* Stack action buttons on mobile */
+  .responsive-table td[data-label="Actions"] {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding-top: 0.75rem;
+  }
+
+  .responsive-table td[data-label="Actions"] > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  /* Better mobile button sizing */
+  .responsive-table button {
+    min-height: 44px; /* iOS touch target */
+    padding: 0.625rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  /* Hide less important info on mobile */
+  .responsive-table td[data-label="UPC"] {
+    font-size: 0.75rem;
+  }
+
+  /* Better typography for mobile */
+  .responsive-table td {
+    font-size: 0.875rem;
+  }
+
+  /* Improve checkbox visibility */
+  .responsive-table td[data-label=""] input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 0.5rem;
+  }
+}
+
+/* Song page hero — cover actions menu opens downward */
+@keyframes coverActionsMenuIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-cover-actions-menu {
+  animation: coverActionsMenuIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Animated gradient for AI Summary */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Hide webpack/Next.js dev indicator and overlay - AGGRESSIVE */
+#__next-build-watcher,
+#__next-dev-overlay,
+iframe[src*="webpack"],
+iframe[src*="__webpack"],
+iframe[src*="next-dev"],
+iframe[src*="hmr"],
+[data-nextjs-toast],
+[data-nextjs-dialog],
+.nextjs-toast-root,
+#__next-dev-overlay-container,
+.__webpack-dev-server-client-overlay__,
+.__webpack-dev-server-client-overlay__div,
+.__webpack-dev-server-client-overlay__iframe,
+[id^="__webpack"],
+[class^="__webpack"],
+[id*="webpack"],
+[class*="webpack"],
+[id*="next-dev"],
+[class*="next-dev"],
+[id*="hmr"],
+[class*="hmr"],
+/* Next.js dev indicator badge */
+div[data-nextjs-dev-indicator],
+div[data-nextjs-dev-indicator] *,
+/* Turbopack dev indicator */
+div[style*="position: fixed"][style*="left: 0"][style*="bottom: 0"],
+div[style*="position:fixed"][style*="left:0"][style*="bottom:0"],
+/* Any div in bottom-left corner that might be the indicator */
+body > div:last-child[style*="position: fixed"][style*="left"],
+body > div:last-child[style*="position:fixed"][style*="left"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: fixed !important;
+  z-index: -9999 !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}/* Hide webpack HMR indicator badge (bottom left corner) - ALL VARIATIONS */
+body > div[style*="position: fixed"][style*="bottom"][style*="left"],
+body > div[style*="position:fixed"][style*="bottom"][style*="left"],
+div[style*="position: fixed"][style*="bottom: 0"][style*="left: 0"],
+div[style*="position:fixed"][style*="bottom:0"][style*="left:0"],
+div[style*="position: fixed"][style*="bottom: 0px"][style*="left: 0px"],
+div[style*="position:fixed"][style*="bottom:0px"][style*="left:0px"],
+div[style*="bottom: 0"][style*="left: 0"],
+div[style*="bottom:0"][style*="left:0"],
+div[style*="bottom: 0px"][style*="left: 0px"],
+div[style*="bottom:0px"][style*="left:0px"],
+/* Target any fixed element in bottom-left */
+body > div[style*="position: fixed"]:has(> div[style*="left: 0"]),
+body > div[style*="position:fixed"]:has(> div[style*="left:0"]),
+/* Next.js/Turbopack indicator with "N" */
+div[style*="cursor: pointer"][style*="position: fixed"][style*="left"],
+div[style*="cursor:pointer"][style*="position:fixed"][style*="left"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}/* Note: Removed overly aggressive CSS rule that was hiding content.
+   The RemoveDevIndicator component handles dev indicator removal instead. *//* More specific: hide anything with webpack in id/class/text */
+* {
+  &[id*="webpack"],
+  &[class*="webpack"],
+  &[id*="__webpack"],
+  &[class*="__webpack"],
+  &[id*="next-dev"],
+  &[class*="next-dev"],
+  &[id*="hmr"],
+  &[class*="hmr"] {
+    display: none !important;
+  }
+}
