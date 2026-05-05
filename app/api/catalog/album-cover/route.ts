@@ -22,7 +22,7 @@ const SMALL_MOTION_COVER_BYTES = 4 * 1024 * 1024
 
 // Configure route for handling large file uploads (videos can be up to 10GB)
 export const runtime = 'nodejs'
-export const maxDuration = 600 // 10 minutes for very large video uploads (up to 10GB)
+export const maxDuration = 300 // Vercel Hobby cap 300s; large uploads rely on chunked/streaming where possible
 
 async function ensureUploadDir() {
   try {

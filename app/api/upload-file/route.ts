@@ -11,7 +11,7 @@ const UPLOAD_DIR = UPLOAD_BASE
 
 // Configure route for handling large file uploads (up to 10GB)
 export const runtime = 'nodejs'
-export const maxDuration = 600 // 10 minutes for very large file uploads (up to 10GB)
+export const maxDuration = 300 // Vercel Hobby cap 300s
 
 // Ensure upload directory exists
 async function ensureUploadDir() {

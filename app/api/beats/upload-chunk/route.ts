@@ -7,7 +7,8 @@ import { parseBeatFilename, validateParsedBeat, cleanBeatNameFromPackProducers, 
 import { writeBeatMetadata } from '@/lib/audioMetadata'
 
 export const runtime = 'nodejs'
-export const maxDuration = 600
+/* Vercel Hobby: max 300s. Pro can raise in dashboard if needed. */
+export const maxDuration = 300
 
 import { getUploadPath } from '@/lib/uploadConfig'
 const BEATS_DIR = getUploadPath('beats')

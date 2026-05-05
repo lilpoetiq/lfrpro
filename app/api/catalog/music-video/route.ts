@@ -11,7 +11,7 @@ const UPLOAD_DIR = getUploadPath('music-videos')
 
 // Configure route for handling large file uploads (videos can be up to 10GB)
 export const runtime = 'nodejs'
-export const maxDuration = 600 // 10 minutes for very large video uploads (up to 10GB)
+export const maxDuration = 300 // Vercel Hobby cap 300s
 
 async function ensureUploadDir() {
   try {

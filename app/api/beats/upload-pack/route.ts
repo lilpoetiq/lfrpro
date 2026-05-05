@@ -19,7 +19,7 @@ const PREVIEWS_DIR = getUploadPath('beats', 'previews')
 
 // Configure route for handling large file uploads
 export const runtime = 'nodejs'
-export const maxDuration = 600 // 10 minutes for large pack uploads
+export const maxDuration = 300 // Vercel Hobby cap 300s
 
 async function ensureDirectories() {
   await mkdir(BEATS_DIR, { recursive: true })
